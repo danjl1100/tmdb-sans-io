@@ -1,8 +1,11 @@
 use tmdb_sans_io::themoviedb::*;
 
 fn main() {
+    let Some(api_key) = option_env!("TMDB_API_KEY") else {
+        panic!("requires TMDB_API_KEY environment variable at compile time")
+    };
     let tmdb = TMDb {
-        api_key: env!("TMDB_API_KEY"),
+        api_key,
         language: "en",
     };
 
