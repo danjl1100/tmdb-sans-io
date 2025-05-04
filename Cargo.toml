@@ -1,12 +1,17 @@
 [package]
 name = "tmdb-sans-io"
 version = "0.1.0"
+edition = "2024"
 authors = ["Daniel Lambert <danjl1100@gmail.com>"]
 description = "The Movie Database (TMDb) API for Rust"
 readme = "README.md"
 license = "MIT"
 
 [dependencies]
+percent-encoding = "2.3.1"
 serde = "1.0.123"
 serde_derive = "1.0.123"
-reqwest = "0.9.5"
+serde_json = "1.0.140"
+
+[dev-dependencies]
+ureq = { version = "3.0.11", features = ["gzip"] }

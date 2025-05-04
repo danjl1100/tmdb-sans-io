@@ -1,7 +1,5 @@
-extern crate tmdb;
-
-use tmdb::model::*;
-use tmdb::themoviedb::*;
+use tmdb_sans_io::model::*;
+use tmdb_sans_io::themoviedb::*;
 
 fn main() {
     let tmdb = TMDb {
@@ -9,16 +7,32 @@ fn main() {
         language: "en",
     };
 
-    let movies = tmdb
+    let movies_get = tmdb // rustfmt hint
         .search()
         .title("Interstellar")
         .year(2014)
-        .execute()
-        .unwrap();
+        .finish();
+
+    let movies = execute_request(movies_get);
 
     let id = movies.results[0].id;
 
-    let interstellar: Movie = tmdb.fetch().id(id).execute().unwrap();
+    let movie_get = tmdb.fetch().id(id).finish();
+
+    let interstellar: Movie = execute_request(movie_get);
 
     println!("{:#?}", interstellar);
+}
+
+fn execute_request<T>(http_get: HttpGet<T>) -> T
+where
+    T: serde::de::DeserializeOwned,
+{
+    let response = ureq::get(http_get.request_url())
+        .call()
+        .unwrap()
+        .into_body()
+        .into_reader();
+
+    http_get.receive_response(response).unwrap()
 }
