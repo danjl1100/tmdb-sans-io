@@ -1,11 +1,8 @@
 [package]
-name = "tmdb"
-version = "3.0.0"
-authors = ["Wolfhard Prell <wolfhard.prell@gmail.com>"]
+name = "tmdb-sans-io"
+version = "0.1.0"
+authors = ["Daniel Lambert <danjl1100@gmail.com>"]
 description = "The Movie Database (TMDb) API for Rust"
-documentation = "https://docs.rs/crate/tmdb"
-homepage = "https://gitlab.com/Cir0X/tmdb-rs"
-repository = "https://gitlab.com/Cir0X/tmdb-rs"
 readme = "README.md"
 license = "MIT"
 

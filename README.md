@@ -1,14 +1,14 @@
-# The Movie Database
+# WORK IN PROGRESS... (The Movie Database)
 
 ![The Movie Database](https://www.themoviedb.org/assets/2/v4/logos/408x161-powered-by-rectangle-green-bb4301c10ddc749b4e79463811a68afebeae66ef43d17bcfd8ff0e60ded7ce99.png)
 
-This is a wrapper around the [TMDb API](https://developers.themoviedb.org/3).
+This is a fork of [tmdb-rs](https://gitlab.com/Cir0X/tmdb-rs), following the [sans-io](https://sans-io.readthedocs.io/) approach to let you build a custom wrapper around the [TMDb API](https://developers.themoviedb.org/3).
 
 ## Usage
 
-```rust
-extern crate tmdb;
+**NOTE** This section needs to be updated for the new usage pattern.
 
+```rust
 use tmdb::model::*;
 use tmdb::themoviedb::*;
 
@@ -22,7 +22,7 @@ fn main() {
         .unwrap();
 
     let id = movies.results[0].id;
-    
+
     let interstellar: Movie = tmdb.fetch()
         .id(id)
         .execute()
@@ -104,5 +104,6 @@ let movies = find_result.movie_results;
 
 ## Acknowledgements
 
-* This lib is heavily inspired by [omdb-rs](https://github.com/aldrio/omdb-rs)
+* This lib is a fork of [tmdb-rs](https://gitlab.com/Cir0X/tmdb-rs)
+* Which was heavily inspired by [omdb-rs](https://github.com/aldrio/omdb-rs)
 * [The Movie Database (TMDb)](https://www.themoviedb.org/)
