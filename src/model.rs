@@ -1,3 +1,5 @@
+use serde_derive::{Deserialize, Serialize};
+
 #[derive(Debug, PartialEq, Deserialize, Serialize)]
 pub struct Genre {
     pub id: u64,
