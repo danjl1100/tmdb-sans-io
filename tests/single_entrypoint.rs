@@ -1,5 +1,8 @@
 //! NOTE: Cargo runs integration test binaries sequentially, so only create one entrypoint
 
+#![expect(clippy::panic)] // tests are allowed to panic
+#![expect(clippy::unwrap_used)] // tests are allowed to unwrap
+
 mod common {
     mod fetch_integration;
 

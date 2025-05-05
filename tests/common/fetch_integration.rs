@@ -18,7 +18,7 @@ fn get_tmdb(language: &'static str) -> TMDb {
 
 #[test]
 fn fetch_movie() {
-    let movie_get = get_tmdb(LANGUAGE).fetch().id(157336).finish();
+    let movie_get = get_tmdb(LANGUAGE).fetch_id(157_336).finish();
     let movie: Movie = execute_request(movie_get);
 
     assert_eq!("Interstellar", movie.original_title);
@@ -26,27 +26,26 @@ fn fetch_movie() {
 
 #[test]
 fn fetch_movie_languages() {
-    let tmdb_en = get_tmdb("en");
-    let movie_en_get = tmdb_en.fetch().id(2277).finish();
-    let movie_en: Movie = execute_request(movie_en_get);
-    assert_eq!("Bicentennial Man", movie_en.title);
+    let tmdb_eng = get_tmdb("en");
+    let movie_en_get = tmdb_eng.fetch_id(2277).finish();
+    let movie_eng: Movie = execute_request(movie_en_get);
+    assert_eq!("Bicentennial Man", movie_eng.title);
 
     let tmdb_de = get_tmdb("de");
-    let movie_de_get = tmdb_de.fetch().id(2277).finish();
+    let movie_de_get = tmdb_de.fetch_id(2277).finish();
     let movie_de: Movie = execute_request(movie_de_get);
     assert_eq!("Der 200 Jahre Mann", movie_de.title);
 
-    let tmdb_es = get_tmdb("es");
-    let movie_es_get = tmdb_es.fetch().id(2277).finish();
-    let movie_es: Movie = execute_request(movie_es_get);
-    assert_eq!("El hombre bicentenario", movie_es.title);
+    let tmdb_esp = get_tmdb("es");
+    let movie_esp_get = tmdb_esp.fetch_id(2277).finish();
+    let movie_esp: Movie = execute_request(movie_esp_get);
+    assert_eq!("El hombre bicentenario", movie_esp.title);
 }
 
 #[test]
 fn fetch_movie_append_to_response() {
     let movie_get = get_tmdb(LANGUAGE)
-        .fetch()
-        .id(2277)
+        .fetch_id(2277)
         .append_videos()
         .append_credits()
         .finish();
@@ -59,8 +58,7 @@ fn fetch_movie_append_to_response() {
 #[test]
 fn search_movie() {
     let page_get = get_tmdb(LANGUAGE) // rustfmt hint
-        .search()
-        .title("Bicentennial Man")
+        .search_title("Bicentennial Man")
         .year(1999)
         .finish();
     let page = execute_request(page_get);
@@ -74,7 +72,7 @@ fn search_movie() {
 
 #[test]
 fn find_movie_by_imdb_id() {
-    let find_get = get_tmdb(LANGUAGE).find().imdb_id("tt0816692").finish();
+    let find_get = get_tmdb(LANGUAGE).find_id("tt0816692").finish();
     let find_result = execute_request(find_get);
 
     let movies = find_result.movie_results;
@@ -89,8 +87,7 @@ fn fetch_searched_movie() {
     let tmdb = get_tmdb(LANGUAGE);
 
     let page_get = tmdb // rustfmt hint
-        .search()
-        .title("Bicentennial Man")
+        .search_title("Bicentennial Man")
         .year(1999)
         .finish();
     let page = execute_request(page_get);
@@ -104,7 +101,7 @@ fn fetch_searched_movie() {
 
 #[test]
 fn fetch_tv() {
-    let tv_get = get_tmdb(LANGUAGE).fetch().id(2316).finish();
+    let tv_get = get_tmdb(LANGUAGE).fetch_id(2316).finish();
     let tv: TV = execute_request(tv_get);
 
     assert_eq!("The Office", tv.original_name);
@@ -113,8 +110,7 @@ fn fetch_tv() {
 #[test]
 fn fetch_tv_append_to_response() {
     let tv_get = get_tmdb(LANGUAGE)
-        .fetch()
-        .id(2316)
+        .fetch_id(2316)
         .append_videos()
         .append_credits()
         .finish();

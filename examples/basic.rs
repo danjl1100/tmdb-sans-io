@@ -1,9 +1,10 @@
-use tmdb_sans_io::model::*;
-use tmdb_sans_io::themoviedb::*;
+use tmdb_sans_io::model::Movie;
+use tmdb_sans_io::themoviedb::{Executable, HttpGet, Search, TMDb, TMDbApi};
 
 fn main() {
     let Some(api_key) = option_env!("TMDB_API_KEY") else {
-        panic!("requires TMDB_API_KEY environment variable at compile time")
+        eprintln!("requires TMDB_API_KEY environment variable at compile time");
+        std::process::exit(1)
     };
     let tmdb = TMDb {
         api_key,
@@ -11,8 +12,7 @@ fn main() {
     };
 
     let movies_get = tmdb // rustfmt hint
-        .search()
-        .title("Interstellar")
+        .search_title("Interstellar")
         .year(2014)
         .finish();
 
@@ -20,11 +20,11 @@ fn main() {
 
     let id = movies.results[0].id;
 
-    let movie_get = tmdb.fetch().id(id).finish();
+    let movie_get = tmdb.fetch_id(id).finish();
 
     let interstellar: Movie = execute_request(movie_get);
 
-    println!("{:#?}", interstellar);
+    println!("{interstellar:#?}");
 }
 
 fn execute_request<T>(http_get: HttpGet<T>) -> T
@@ -33,9 +33,11 @@ where
 {
     let response = ureq::get(http_get.request_url())
         .call()
-        .unwrap()
+        .expect("HTTP should succeed")
         .into_body()
         .into_reader();
 
-    http_get.receive_response(response).unwrap()
+    http_get
+        .receive_response(response)
+        .expect("HTTP response should be the expected JSON object format")
 }

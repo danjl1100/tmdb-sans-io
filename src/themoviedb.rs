@@ -14,14 +14,14 @@ pub trait Search<'a> {
 
 #[derive(Debug)]
 pub struct SearchData<'a> {
-    pub tmdb: TMDb,
-    pub title: Option<&'a str>,
-    pub year: Option<u64>,
+    tmdb: TMDb,
+    title: &'a str,
+    year: Option<u64>,
 }
 
 impl<'a> Search<'a> for SearchData<'a> {
     fn title(&mut self, title: &'a str) -> &mut SearchData<'a> {
-        self.title = Some(title);
+        self.title = title;
         self
     }
 
@@ -50,16 +50,25 @@ where
     }
 
     /// Returns the URL needed to fulfill the request
+    #[must_use]
     pub fn request_url(&self) -> &str {
         &self.request_url
     }
     /// Parses the response string into the desired result
     ///
     /// Convenience function for [`Self::receive_response`]
-    pub fn receive_response_str(self, response: String) -> Result<T, Error> {
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the string is not valid JSON for the expected data model type
+    pub fn receive_response_str(self, response: &str) -> Result<T, Error> {
         self.receive_response(response.as_bytes())
     }
     /// Parses the response into the desired result
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the string is not valid JSON for the expected data model type
     pub fn receive_response(self, response: impl std::io::Read) -> Result<T, Error> {
         serde_json::from_reader(response)
             .map_err(ErrorKind::SerdeDecode)
@@ -91,20 +100,20 @@ impl std::fmt::Display for Error {
     }
 }
 
-impl<'a> Executable<SearchResult> for SearchData<'a> {
+impl Executable<SearchResult> for SearchData<'_> {
     fn finish(&self) -> HttpGet<SearchResult> {
         let relative_url: String = match self.year {
             None => format!(
                 "/search/movie?api_key={}&language={}&query={}&append_to_response=images",
-                self.tmdb.api_key,
+                self.tmdb.api_key, // rustfmt hint
                 self.tmdb.language,
-                self.title.unwrap()
+                self.title
             ),
             Some(year) => format!(
                 "/search/movie?api_key={}&language={}&query={}&year={}&append_to_response=images",
-                self.tmdb.api_key,
+                self.tmdb.api_key, // rustfmt hint
                 self.tmdb.language,
-                self.title.unwrap(),
+                self.title,
                 year
             ),
         };
@@ -125,14 +134,14 @@ pub trait Fetch {
 }
 
 pub struct FetchData {
-    pub tmdb: TMDb,
-    pub id: Option<u64>,
-    pub append_to_response: Vec<Appendable>,
+    tmdb: TMDb,
+    id: u64,
+    append_to_response: Vec<Appendable>,
 }
 
 impl Fetch for FetchData {
     fn id(&mut self, id: u64) -> &mut FetchData {
-        self.id = Some(id);
+        self.id = id;
         self
     }
 
@@ -151,7 +160,7 @@ impl Executable<Movie> for FetchData {
     fn finish(&self) -> HttpGet<Movie> {
         let mut relative_url: String = format!(
             "/movie/{}?api_key={}&language={}",
-            self.id.unwrap(),
+            self.id, // rustfmt hint
             self.tmdb.api_key,
             self.tmdb.language
         );
@@ -176,7 +185,7 @@ impl Executable<TV> for FetchData {
     fn finish(&self) -> HttpGet<TV> {
         let mut relative_url: String = format!(
             "/tv/{}?api_key={}&language={}",
-            self.id.unwrap(),
+            self.id, // rustfmt hint
             self.tmdb.api_key,
             self.tmdb.language
         );
@@ -203,21 +212,21 @@ pub trait Find<'a> {
 
 pub struct FindData<'a> {
     pub tmdb: TMDb,
-    pub imdb_id: Option<&'a str>,
+    pub imdb_id: &'a str,
 }
 
 impl<'a> Find<'a> for FindData<'a> {
     fn imdb_id(&mut self, imdb_id: &'a str) -> &mut FindData<'a> {
-        self.imdb_id = Some(imdb_id);
+        self.imdb_id = imdb_id;
         self
     }
 }
 
-impl<'a> Executable<FindResult> for FindData<'a> {
+impl Executable<FindResult> for FindData<'_> {
     fn finish(&self) -> HttpGet<FindResult> {
         let relative_url = format!(
             "/find/{}?api_key={}&external_source=imdb_id&language={}&append_to_response=images",
-            self.imdb_id.unwrap(),
+            self.imdb_id, // rustfmt hint
             self.tmdb.api_key,
             self.tmdb.language
         );
@@ -227,9 +236,9 @@ impl<'a> Executable<FindResult> for FindData<'a> {
 }
 
 pub trait TMDbApi {
-    fn search(&self) -> SearchData;
-    fn fetch(&self) -> FetchData;
-    fn find(&self) -> FindData;
+    fn search_title<'a>(&self, title: &'a str) -> SearchData<'a>;
+    fn fetch_id(&self, id: u64) -> FetchData;
+    fn find_id<'a>(&self, tmdb_id: &'a str) -> FindData<'a>;
 }
 
 #[derive(Debug, Clone)]
@@ -239,30 +248,27 @@ pub struct TMDb {
 }
 
 impl TMDbApi for TMDb {
-    fn search(&self) -> SearchData {
+    fn search_title<'a>(&self, title: &'a str) -> SearchData<'a> {
         let tmdb = self.clone();
         SearchData {
             tmdb,
-            title: None,
+            title,
             year: None,
         }
     }
 
-    fn fetch(&self) -> FetchData {
+    fn fetch_id(&self, id: u64) -> FetchData {
         let tmdb = self.clone();
         FetchData {
             tmdb,
-            id: None,
+            id,
             append_to_response: vec![],
         }
     }
 
-    fn find(&self) -> FindData {
+    fn find_id<'a>(&self, imdb_id: &'a str) -> FindData<'a> {
         let tmdb = self.clone();
-        FindData {
-            tmdb,
-            imdb_id: None,
-        }
+        FindData { tmdb, imdb_id }
     }
 }
 
@@ -272,12 +278,12 @@ pub trait Fetchable {
 
 impl Fetchable for SearchMovie {
     fn fetch(&self, tmdb: &TMDb) -> HttpGet<Movie> {
-        tmdb.fetch().id(self.id).finish()
+        tmdb.fetch_id(self.id).finish()
     }
 }
 
 fn build_url(relative_raw: &str) -> String {
-    /// https://url.spec.whatwg.org/#query-percent-encode-set
+    /// <https://url.spec.whatwg.org/#query-percent-encode-set>
     const QUERY: &percent_encoding::AsciiSet = &percent_encoding::CONTROLS
         .add(b' ')
         .add(b'"')

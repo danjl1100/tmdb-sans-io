@@ -3,9 +3,35 @@ name = "tmdb-sans-io"
 version = "0.1.0"
 edition = "2024"
 authors = ["Daniel Lambert <danjl1100@gmail.com>"]
-description = "The Movie Database (TMDb) API for Rust"
+description = "The Movie Database (TMDb) API for Rust, sans io"
+homepage = "https://github.com/danjl1100/tmdb-sans-io"
+repository = "https://github.com/danjl1100/tmdb-sans-io"
 readme = "README.md"
 license = "MIT"
+keywords = ["tmdb", "sans-io", "database", "movie", "tv"]
+
+[lints.clippy]
+# teach me
+pedantic = { level = "warn", priority = -1}
+# except this confusing pattern
+bool_to_int_with_if = { level = "allow", priority = 1}
+
+# no unwrap
+unwrap_used = "deny"
+# no panic
+panic = "deny"
+
+[lints.rust]
+# TODO: lint for missing docs
+# # docs!
+# missing_docs = "deny"
+
+# no unsafe
+unsafe_code = "forbid"
+
+[lints.rustdoc]
+# docs!
+broken_intra_doc_links = "deny"
 
 [dependencies]
 percent-encoding = "2.3.1"
