@@ -54,8 +54,7 @@ let response = {
     let request_url = page_request.request_url();
     unimplemented!("INSERT YOUR HTTP CLIENT LIBRARY HERE");
 };
-let page = page_request.receive_response(response)
-    .unwrap();
+let page = page_request.receive_response(response)?;
 
 let movies = page.results;
 ```
@@ -72,8 +71,7 @@ let response = {
     let request_url = movie_request.request_url();
     unimplemented!("INSERT YOUR HTTP CLIENT LIBRARY HERE");
 };
-let movie = movie_request.receive_response(response)
-    .unwrap();
+let movie = movie_request.receive_response(response)?;
 ```
 
 When you don't have any movie ID, you can search for a movie and then easily fetch the full details.
@@ -87,8 +85,7 @@ let response = {
     let request_url = page_request.request_url();
     unimplemented!("INSERT YOUR HTTP CLIENT LIBRARY HERE");
 };
-let page = page_request.receive_response(response)
-   .unwrap();
+let page = page_request.receive_response(response)?;
 
 let movies = page.results;
 let movie_request = movies[0].fetch(&tmdb);
@@ -96,8 +93,7 @@ let response = {
     let request_url = movie_request.request_url();
     unimplemented!("INSERT YOUR HTTP CLIENT LIBRARY HERE");
 };
-let movie = movie_request.receive_response(response)
-    .unwrap();
+let movie = movie_request.receive_response(response)?;
 ```
 
 Furthermore you can request some more data with the [append to response](https://developers.themoviedb.org/3/getting-started/append-to-response) feature.

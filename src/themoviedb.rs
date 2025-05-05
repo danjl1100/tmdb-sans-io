@@ -211,8 +211,8 @@ pub trait Find<'a> {
 }
 
 pub struct FindData<'a> {
-    pub tmdb: TMDb,
-    pub imdb_id: &'a str,
+    tmdb: TMDb,
+    imdb_id: &'a str,
 }
 
 impl<'a> Find<'a> for FindData<'a> {
