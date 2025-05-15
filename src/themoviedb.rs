@@ -12,7 +12,7 @@ pub trait Search<'a> {
     fn year(&mut self, year: u64) -> &mut SearchData<'a>;
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct SearchData<'a> {
     tmdb: TMDb,
     title: &'a str,
@@ -31,6 +31,7 @@ impl<'a> Search<'a> for SearchData<'a> {
     }
 }
 
+#[derive(Clone, Debug)]
 pub struct HttpGet<T>
 where
     T: serde::de::DeserializeOwned,
@@ -122,6 +123,7 @@ impl Executable<SearchResult> for SearchData<'_> {
     }
 }
 
+#[derive(Clone, Copy, Debug)]
 pub enum Appendable {
     Videos,
     Credits,
@@ -133,6 +135,7 @@ pub trait Fetch {
     fn append_credits(&mut self) -> &mut FetchData;
 }
 
+#[derive(Clone, Debug)]
 pub struct FetchData {
     tmdb: TMDb,
     id: u64,
@@ -210,6 +213,7 @@ pub trait Find<'a> {
     fn imdb_id(&mut self, imdb_id: &'a str) -> &mut FindData<'a>;
 }
 
+#[derive(Clone, Debug)]
 pub struct FindData<'a> {
     tmdb: TMDb,
     imdb_id: &'a str,
@@ -241,7 +245,7 @@ pub trait TMDbApi {
     fn find_id<'a>(&self, tmdb_id: &'a str) -> FindData<'a>;
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone, Debug)]
 pub struct TMDb {
     pub api_key: &'static str,
     pub language: &'static str,
