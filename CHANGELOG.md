@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Added
 
-- Derives for common traits (`Clone`, `Debug`) to public structs
+- Derive common traits (`Clone`, `Debug`) for all public structs
 
 ## [0.1.0] - 2025-05-04
 
