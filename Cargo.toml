@@ -1,6 +1,6 @@
 [package]
 name = "tmdb-sans-io"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 authors = ["Daniel Lambert <danjl1100@gmail.com>"]
 description = "The Movie Database (TMDb) API for Rust, sans io"
