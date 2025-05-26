@@ -315,7 +315,6 @@ pub trait TMDbApi {
     fn search_title<'a>(&self, title: &'a str) -> SearchData<'a>;
     fn fetch_id(&self, id: u64) -> FetchData;
     fn find_id<'a>(&self, tmdb_id: &'a str) -> FindData<'a>;
-    fn fetch_config(&self) -> FetchConfig;
 }
 
 #[derive(Clone, Debug)]
@@ -347,8 +346,11 @@ impl TMDbApi for TMDb {
         let tmdb = self.clone();
         FindData { tmdb, imdb_id }
     }
-
-    fn fetch_config(&self) -> FetchConfig {
+}
+// TODO: do any of the methods above need to be in a trait?
+impl TMDb {
+    #[must_use]
+    pub fn fetch_config(&self) -> FetchConfig {
         let tmdb = self.clone();
         FetchConfig { tmdb }
     }
