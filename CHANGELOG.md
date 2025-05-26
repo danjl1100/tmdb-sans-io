@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Added
+
+- TV seasons query by ID (`tmdb.fetch_tv_season().id`)
+- Configuration details query (`tmdb.fetch_config()`)
+
+## Changed
+
+- Deprecated all-caps acronyms ( `TV`, `TVCast`, `TVCreator`, and `TVCredits`)
+  in favor of camel case names ( `Tv`, `TvCast`, `TvCreator`, and `TvCredits`)
+
 ## [0.1.1] - 2025-05-24
 
 ### Added

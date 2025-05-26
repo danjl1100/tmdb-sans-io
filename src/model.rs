@@ -1,5 +1,14 @@
 use serde_derive::{Deserialize, Serialize};
 
+#[deprecated = "use the camel case type `TvCast` directly"]
+pub type TVCast = TvCast;
+#[deprecated = "use the camel case type `TvCreator` directly"]
+pub type TVCreator = TvCreator;
+#[deprecated = "use the camel case type `TvCredits` directly"]
+pub type TVCredits = TvCredits;
+#[deprecated = "use the camel case type `Tv` directly"]
+pub type TV = Tv;
+
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct Genre {
     pub id: u64,
@@ -36,7 +45,7 @@ pub struct Cast {
 }
 
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-pub struct TVCast {
+pub struct TvCast {
     pub id: u64,
     pub credit_id: String,
     pub character: String,
@@ -47,7 +56,7 @@ pub struct TVCast {
 }
 
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-pub struct TVCreator {
+pub struct TvCreator {
     pub id: u64,
     pub credit_id: String,
     pub name: String,
@@ -73,8 +82,8 @@ pub struct Credits {
 }
 
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-pub struct TVCredits {
-    pub cast: Vec<TVCast>,
+pub struct TvCredits {
+    pub cast: Vec<TvCast>,
     pub crew: Vec<Crew>,
 }
 
@@ -142,10 +151,10 @@ pub struct Movie {
 }
 
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
-pub struct TV {
+pub struct Tv {
     pub id: u64,
     pub backdrop_path: Option<String>,
-    pub created_by: Vec<TVCreator>,
+    pub created_by: Vec<TvCreator>,
     pub episode_run_time: Vec<u64>,
     pub first_air_date: String,
     pub genres: Vec<Genre>,
@@ -171,7 +180,31 @@ pub struct TV {
     pub vote_average: f64,
     pub vote_count: u64,
     pub videos: Option<Results<Video>>,
-    pub credits: Option<TVCredits>,
+    pub credits: Option<TvCredits>,
+}
+
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct TvSeason {
+    pub episodes: Vec<TvEpisode>,
+    pub id: u64,
+    pub name: String,
+    pub overview: String,
+    pub poster_path: Option<String>,
+    pub season_number: u32,
+}
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct TvEpisode {
+    pub air_date: String,
+    pub episode_number: u32,
+    pub id: u64,
+    pub name: String,
+    pub overview: String,
+    pub production_code: Option<String>,
+    pub still_path: Option<String>,
+    pub vote_average: f64,
+    pub vote_count: u64,
 }
 
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
@@ -214,4 +247,15 @@ pub struct SearchResult {
 #[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
 pub struct FindResult {
     pub movie_results: Vec<FindMovie>,
+}
+
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct ConfigDetails {
+    pub images: ConfigImageDetails,
+}
+#[derive(Clone, Debug, PartialEq, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct ConfigImageDetails {
+    pub base_url: String,
 }

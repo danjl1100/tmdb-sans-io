@@ -1,4 +1,4 @@
-use crate::model::{FindResult, Movie, SearchMovie, SearchResult, TV};
+use crate::model::{ConfigDetails, FindResult, Movie, SearchMovie, SearchResult, Tv, TvSeason};
 
 pub trait Executable<T>
 where
@@ -142,6 +142,14 @@ pub struct FetchData {
     append_to_response: Vec<Appendable>,
 }
 
+impl FetchData {
+    pub fn tv_season(self, season_number: u32) -> FetchDataTvSeason {
+        FetchDataTvSeason {
+            fetch_data: self,
+            season_number,
+        }
+    }
+}
 impl Fetch for FetchData {
     fn id(&mut self, id: u64) -> &mut FetchData {
         self.id = id;
@@ -184,8 +192,8 @@ impl Executable<Movie> for FetchData {
     }
 }
 
-impl Executable<TV> for FetchData {
-    fn finish(&self) -> HttpGet<TV> {
+impl Executable<Tv> for FetchData {
+    fn finish(&self) -> HttpGet<Tv> {
         let mut relative_url: String = format!(
             "/tv/{}?api_key={}&language={}",
             self.id, // rustfmt hint
@@ -196,6 +204,55 @@ impl Executable<TV> for FetchData {
         if !self.append_to_response.is_empty() {
             relative_url.push_str("&append_to_response=");
             for appendable in &self.append_to_response {
+                match appendable {
+                    Appendable::Videos => relative_url.push_str("videos,"),
+                    Appendable::Credits => relative_url.push_str("credits,"),
+                }
+            }
+        }
+
+        let url = build_url(&relative_url);
+
+        HttpGet::new(url)
+    }
+}
+
+#[derive(Clone, Debug)]
+#[must_use]
+pub struct FetchDataTvSeason {
+    fetch_data: FetchData,
+    season_number: u32,
+}
+impl Fetch for FetchDataTvSeason {
+    fn id(&mut self, id: u64) -> &mut FetchData {
+        self.fetch_data.id(id)
+    }
+    fn append_videos(&mut self) -> &mut FetchData {
+        self.fetch_data.append_videos()
+    }
+    fn append_credits(&mut self) -> &mut FetchData {
+        self.fetch_data.append_credits()
+    }
+}
+
+impl Executable<TvSeason> for FetchDataTvSeason {
+    fn finish(&self) -> HttpGet<TvSeason> {
+        let Self {
+            fetch_data:
+                FetchData {
+                    tmdb: TMDb { api_key, language },
+                    id,
+                    append_to_response,
+                },
+            season_number,
+        } = self;
+
+        let mut relative_url: String =
+            format!("/tv/{id}/season/{season_number}?api_key={api_key}&language={language}");
+
+        if !append_to_response.is_empty() {
+            relative_url.push_str("&append_to_response=");
+            for appendable in append_to_response {
                 match appendable {
                     Appendable::Videos => relative_url.push_str("videos,"),
                     Appendable::Credits => relative_url.push_str("credits,"),
@@ -239,10 +296,26 @@ impl Executable<FindResult> for FindData<'_> {
     }
 }
 
+#[derive(Clone, Debug)]
+pub struct FetchConfig {
+    tmdb: TMDb,
+}
+impl Executable<ConfigDetails> for FetchConfig {
+    fn finish(&self) -> HttpGet<ConfigDetails> {
+        let relative_url = format!(
+            "/configuration?api_key={}&language={}",
+            self.tmdb.api_key, self.tmdb.language
+        );
+        let url = build_url(&relative_url);
+        HttpGet::new(url)
+    }
+}
+
 pub trait TMDbApi {
     fn search_title<'a>(&self, title: &'a str) -> SearchData<'a>;
     fn fetch_id(&self, id: u64) -> FetchData;
     fn find_id<'a>(&self, tmdb_id: &'a str) -> FindData<'a>;
+    fn fetch_config(&self) -> FetchConfig;
 }
 
 #[derive(Clone, Debug)]
@@ -274,6 +347,11 @@ impl TMDbApi for TMDb {
         let tmdb = self.clone();
         FindData { tmdb, imdb_id }
     }
+
+    fn fetch_config(&self) -> FetchConfig {
+        let tmdb = self.clone();
+        FetchConfig { tmdb }
+    }
 }
 
 pub trait Fetchable {
@@ -296,8 +374,6 @@ fn build_url(relative_raw: &str) -> String {
         .add(b'>');
 
     const BASE_URL: &str = "https://api.themoviedb.org/3";
-    // const BASE_IMG_URL: &'static str = "https://image.tmdb.org/t/p/w500";
-    // "https://image.tmdb.org/t/p/w700_and_h392_bestv2/gq4Z1pfOWHn3FKFNutlDCySps9C.jpg"
 
     let absolute_raw = format!("{BASE_URL}{relative_raw}");
 

@@ -1,5 +1,5 @@
 use crate::common::execute_request;
-use tmdb_sans_io::model::{Movie, TV};
+use tmdb_sans_io::model::{Movie, Tv};
 use tmdb_sans_io::themoviedb::*;
 
 const API_KEY: Option<&str> = option_env!("TMDB_API_KEY");
@@ -102,7 +102,7 @@ fn fetch_searched_movie() {
 #[test]
 fn fetch_tv() {
     let tv_get = get_tmdb(LANGUAGE).fetch_id(2316).finish();
-    let tv: TV = execute_request(tv_get);
+    let tv: Tv = execute_request(tv_get);
 
     assert_eq!("The Office", tv.original_name);
 }
@@ -114,7 +114,7 @@ fn fetch_tv_append_to_response() {
         .append_videos()
         .append_credits()
         .finish();
-    let tv: TV = execute_request(tv_get);
+    let tv: Tv = execute_request(tv_get);
 
     assert!(tv.videos.is_some());
     assert!(tv.credits.is_some());

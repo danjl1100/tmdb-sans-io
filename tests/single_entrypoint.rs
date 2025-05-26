@@ -4,6 +4,7 @@
 #![expect(clippy::unwrap_used)] // tests are allowed to unwrap
 
 mod common {
+    mod fetch_http_layer;
     mod fetch_integration;
 
     fn execute_request<T>(http_get: tmdb_sans_io::themoviedb::HttpGet<T>) -> T
